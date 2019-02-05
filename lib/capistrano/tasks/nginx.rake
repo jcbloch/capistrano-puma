@@ -12,3 +12,27 @@ namespace :puma do
     end
   end
 end
+
+namespace :nginx do
+  desc 'reload nginx config'
+  task :reload do
+    on roles(fetch(:puma_nginx, :web)) do |role|
+      info capture("sudo service nginx reload")
+    end
+  end
+
+  desc 'check nginx status'
+  task :status do
+    on roles(fetch(:puma_nginx, :web)) do |role|
+      info capture("sudo service nginx status")
+    end
+  end
+
+  desc 'restart nginx'
+  task :restart do
+    on roles(fetch(:puma_nginx, :web)) do |role|
+      info capture("sudo service nginx status")
+    end
+  end
+
+end

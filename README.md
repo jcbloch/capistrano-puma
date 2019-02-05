@@ -1,6 +1,12 @@
 [![Gem Version](https://badge.fury.io/rb/capistrano3-puma.svg)](http://badge.fury.io/rb/capistrano3-puma)
 # Capistrano::Puma
 
+##  Changes in the fork:
+
+- make code compatible with RVM (multiuser, mixed-mode and single-user)
+- add some logging (for debuggin)
+- add nginx tasks (reload, start, status)
+
 ## Installation
 
 Add this line to your application's Gemfile:
