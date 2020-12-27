@@ -32,6 +32,14 @@ And then execute:
     install_plugin Capistrano::Puma::Monit  # if you need the monit tasks
     install_plugin Capistrano::Puma::Nginx  # if you want to upload a nginx site template
 ```
+You will need to select your service manager
+```ruby
+install_plugin Capistrano::Puma::Daemon  # If you using puma daemonized (not supported in Puma 5+)
+```
+or
+```ruby
+install_plugin Capistrano::Puma::Systemd  # if you use SystemD 
+```
 
 To prevent loading the hooks of the plugin, add false to the load_hooks param.
 ```ruby
@@ -40,6 +48,15 @@ To prevent loading the hooks of the plugin, add false to the load_hooks param.
     require 'capistrano/puma'
     install_plugin Capistrano::Puma, load_hooks: false  # Default puma tasks without hooks
     install_plugin Capistrano::Puma::Monit, load_hooks: false  # Monit tasks without hooks
+```
+
+To make it work with rvm, rbenv and chruby, install the plugin after corresponding library inclusion.
+```ruby
+    # Capfile
+    
+    require 'capistrano/rbenv'   
+    require 'capistrano/puma'
+    install_plugin Capistrano::Puma
 ```
 
 ### Config
@@ -92,6 +109,19 @@ For Jungle tasks (beta), these options exist:
     set :puma_run_path, '/usr/local/bin/run-puma'
 ```
 
+### Systemd
+
+Install Systemd plugin in `Capfile`:
+```ruby
+install_plugin Capistrano::Puma
+install_plugin Capistrano::Puma::Systemd
+```
+
+To generate unit file use:
+```
+cap production puma:systemd:config puma:systemd:enable
+```
+
 ### Multi bind
 
 Multi-bind can be set with an array in the puma_bind variable
@@ -134,6 +164,7 @@ Configurable options, shown here with defaults: Please note the configuration op
     set :puma_plugins, []  #accept array of plugins
     set :puma_tag, fetch(:application)
     set :puma_restart_command, 'bundle exec puma'
+    set :puma_service_unit_name, "puma_#{fetch(:application)}_#{fetch(:stage)}"
 
     set :nginx_config_name, "#{fetch(:application)}_#{fetch(:stage)}"
     set :nginx_flags, 'fail_timeout=0'
@@ -145,6 +176,8 @@ Configurable options, shown here with defaults: Please note the configuration op
     set :nginx_ssl_certificate, "/etc/ssl/certs/#{fetch(:nginx_config_name)}.crt"
     set :nginx_ssl_certificate_key, "/etc/ssl/private/#{fetch(:nginx_config_name)}.key"
     set :nginx_use_ssl, false
+    set :nginx_use_http2, true
+    set :nginx_downstream_uses_ssl, false
 ```
 
 __Notes:__ If you are setting values for variables that might be used by other plugins, use `append` instead of `set`. For example:
